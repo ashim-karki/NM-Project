@@ -93,12 +93,93 @@ def solvingODEmain():
     btn2 = Button(solvingODEwindow, text="Submit", fg="black", command = solvingODEplacedata)
     btn2.place(x=80, y=400)
 
+def solvingNonLinearEqnMain():
+    
+    def secant(x0, x1, function, steps, tol_error):
+        def showGraph():
+            x = np.linspace(-5, 5, 50)
+            plt.plot(x, eval(function), label="Graph of function")
+            plt.grid()
+            plt.axhline(y=0)
+            plt.axvline(x=0)
+            plt.show()
+        def f(x):
+            return eval(function)
+        count = 1
+        e = tol_error
+        condition = True
+        ZeroDeno = False
+        NoConverge = False
+        max_steps=steps
+        while condition:
+            if f(x0) == f(x1): 
+                print("Zero Denominator\n")
+                ZeroDeno = True
+                break 
+            x2 = x0 - (x1-x0)*f(x0)/(f(x1) - f(x0))
+            x0 = x1
+            x1 = x2 
+            count += 1
+            if count > max_steps:
+                print("Does not converge\n")
+                NoConverge = True
+                break 
+            condition = abs(f(x2)) > e 
+        if ZeroDeno:
+            outputText = Label(solvingNonLinearEqnWindow, text="The x-value has zero denominator!", font=('Arial', 15), justify=CENTER).place(x=80, y=450)
+        elif NoConverge:
+            outputText = Label(solvingNonLinearEqnWindow, text="The x-value does not converge!", font=('Arial', 15), justify=CENTER).place(x=80, y=450)
+        else:
+            outputText = Label(solvingNonLinearEqnWindow, text="The root of the function = " + str(x2), font=('Arial', 15), justify=CENTER).place(x=80, y=450)
+        graphbtn = Button(solvingNonLinearEqnWindow, text="Show Graph", fg="black", command=showGraph).place(x=80, y=490)
+
+    def placeData():
+        x1 = x1lbl.get()
+        x2 = x2lbl.get() 
+        func = flbl.get()
+        steps = nlbl.get()
+        tol_error = elbl.get()
+        secant(float(x1), float(x2), func, int(steps), float(tol_error))
+
+    solvingNonLinearEqnWindow = Toplevel(window)
+    solvingNonLinearEqnWindow.geometry("800x800+560+140")
+    solvingNonLinearEqnFrame = Frame(solvingNonLinearEqnWindow)
+    solvingNonLinearEqnFrame.pack(side = TOP, pady = 50)
+    title = Label(solvingNonLinearEqnFrame, text="Solving Non Linear Equations", font = ('Arial', 25))
+    title.pack()
+    x1text = Label(solvingNonLinearEqnWindow, text="x1 =", font=('Arial', 10))
+    x1text.place(x=45, y=148)
+    x1lbl = Entry(solvingNonLinearEqnWindow, width=45) 
+    x1lbl.place(x=80, y=150)
+    x2text = Label(solvingNonLinearEqnWindow, text="y0 =", font=('Arial', 10))
+    x2text.place(x=45, y=198)
+    x2lbl = Entry(solvingNonLinearEqnWindow, width=45) 
+    x2lbl.place(x=80, y=200)
+    ftext = Label(solvingNonLinearEqnWindow, text="f(x) =", font=('Arial', 10))
+    ftext.place(x=42, y=248)
+    flbl = Entry(solvingNonLinearEqnWindow, width=45) 
+    flbl.place(x=80, y=250)
+    ntext = Label(solvingNonLinearEqnWindow, text="n =", font=('Arial', 10))
+    ntext.place(x=52, y=298)
+    nlbl = Entry(solvingNonLinearEqnWindow, width=45) 
+    nlbl.place(x=80, y=300)
+    etext = Label(solvingNonLinearEqnWindow, text="e =", font=('Arial', 10))
+    etext.place(x=52, y=348)
+    elbl = Entry(solvingNonLinearEqnWindow, width=45) 
+    elbl.place(x=80, y=350)
+    btn = Button(solvingNonLinearEqnWindow, text="Submit for Secant Method", fg="black", command = placeData)
+    btn.place(x=80, y=400)
+
+         
 window.title('Numerical Methods')
 maintitleframe = Frame(window)
 maintitleframe.pack(side=TOP, pady=50)
 maintitletext = Label(maintitleframe, text="Numerical Methods - SH553", font=('Arial', 25))
 maintitletext.pack()
 window.geometry("800x800+560+140")
-btn = Button(window, text="Solving first order ODE", fg="black", command = solvingODEmain, font=('Arial',12), width=60)
-btn.pack()
+btn1 = Button(window, text="Solving first order ODE", fg="black", command = solvingODEmain, font=('Arial',12), width=60)
+btn1.pack()
+btn2 = Button(window, text="Solution of Non-Linear Equations", fg="black", command = solvingNonLinearEqnMain, font=('Arial',12), width=60)
+btn2.pack()
 window.mainloop()
+
