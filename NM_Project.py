@@ -2,6 +2,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from tkinter import *
+from sympy import *
 
 window = Tk()
 
@@ -64,6 +65,7 @@ def solvingODEmain():
         n = nlbl.get()
         function = func.get()
         solvingODE(float(x0), float(y0), float(xn), int(n), function)
+
     solvingODEwindow = Toplevel(window)
     solvingODEframe = Frame(solvingODEwindow)
     solvingODEframe.pack(side = TOP, pady=50)
@@ -94,7 +96,6 @@ def solvingODEmain():
     btn2.place(x=80, y=400)
 
 def solvingNonLinearEqnMain():
-    
     def secant(x0, x1, function, steps, tol_error):
         def showGraph():
             x = np.linspace(-5, 5, 50)
@@ -126,14 +127,14 @@ def solvingNonLinearEqnMain():
                 break 
             condition = abs(f(x2)) > e 
         if ZeroDeno:
-            outputText = Label(solvingNonLinearEqnWindow, text="The x-value has zero denominator!", font=('Arial', 15), justify=CENTER).place(x=80, y=450)
+            outputText = Label(solvingNonLinearEqnWindow, text="Zero denominator!", font=('Arial', 15), justify=CENTER).place(x=80, y=450)
         elif NoConverge:
-            outputText = Label(solvingNonLinearEqnWindow, text="The x-value does not converge!", font=('Arial', 15), justify=CENTER).place(x=80, y=450)
+            outputText = Label(solvingNonLinearEqnWindow, text="Does not converge!", font=('Arial', 15), justify=CENTER).place(x=80, y=450)
         else:
-            outputText = Label(solvingNonLinearEqnWindow, text="The root of the function = " + str(x2), font=('Arial', 15), justify=CENTER).place(x=80, y=450)
+            outputText = Label(solvingNonLinearEqnWindow, text="Root = " + str(x2), font=('Arial', 15), justify=CENTER).place(x=80, y=450)
         graphbtn = Button(solvingNonLinearEqnWindow, text="Show Graph", fg="black", command=showGraph).place(x=80, y=490)
 
-    def placeData():
+    def placeDataS():
         x1 = x1lbl.get()
         x2 = x2lbl.get() 
         func = flbl.get()
@@ -141,6 +142,7 @@ def solvingNonLinearEqnMain():
         tol_error = elbl.get()
         secant(float(x1), float(x2), func, int(steps), float(tol_error))
 
+    #for secant method
     solvingNonLinearEqnWindow = Toplevel(window)
     solvingNonLinearEqnWindow.geometry("800x800+560+140")
     solvingNonLinearEqnFrame = Frame(solvingNonLinearEqnWindow)
@@ -151,7 +153,7 @@ def solvingNonLinearEqnMain():
     x1text.place(x=45, y=148)
     x1lbl = Entry(solvingNonLinearEqnWindow, width=45) 
     x1lbl.place(x=80, y=150)
-    x2text = Label(solvingNonLinearEqnWindow, text="y0 =", font=('Arial', 10))
+    x2text = Label(solvingNonLinearEqnWindow, text="x2 =", font=('Arial', 10))
     x2text.place(x=45, y=198)
     x2lbl = Entry(solvingNonLinearEqnWindow, width=45) 
     x2lbl.place(x=80, y=200)
@@ -159,18 +161,88 @@ def solvingNonLinearEqnMain():
     ftext.place(x=42, y=248)
     flbl = Entry(solvingNonLinearEqnWindow, width=45) 
     flbl.place(x=80, y=250)
-    ntext = Label(solvingNonLinearEqnWindow, text="n =", font=('Arial', 10))
-    ntext.place(x=52, y=298)
-    nlbl = Entry(solvingNonLinearEqnWindow, width=45) 
-    nlbl.place(x=80, y=300)
     etext = Label(solvingNonLinearEqnWindow, text="e =", font=('Arial', 10))
-    etext.place(x=52, y=348)
+    etext.place(x=52, y=298)
     elbl = Entry(solvingNonLinearEqnWindow, width=45) 
-    elbl.place(x=80, y=350)
-    btn = Button(solvingNonLinearEqnWindow, text="Submit for Secant Method", fg="black", command = placeData)
+    elbl.place(x=80, y=300)
+    ntext = Label(solvingNonLinearEqnWindow, text="n =", font=('Arial', 10))
+    ntext.place(x=52, y=348)
+    nlbl = Entry(solvingNonLinearEqnWindow, width=45) 
+    nlbl.place(x=80, y=350)
+    btn = Button(solvingNonLinearEqnWindow, text="Submit for Secant Method", fg="black", command = placeDataS)
     btn.place(x=80, y=400)
 
-         
+    def NewtonRhapson(xval, function, e, n):   
+        def f(x):
+            return eval(function)
+        def differentiator(f, xval):
+            x = symbols('x')
+            df = diff(f, x)
+            dftext = Label(solvingNonLinearEqnWindow, text="df(x)/dx = " + str(df), font=('Arial', 10))
+            dftext.place(x=430, y=198)
+            return df.subs(x, xval).evalf()
+        def showGraph():
+            yforgraph = []
+            xforgraph = []
+            x = np.linspace(-40,40,500)
+            for i in range(500):
+                xforgraph.append(x[i])
+                yforgraph.append(f(x[i]))
+            plt.plot(xforgraph, yforgraph, label="Graph for function")
+            plt.grid()
+            plt.axhline(y=0)
+            plt.axvline(x=0)
+            plt.show()
+        condition = True
+        osciflag = False
+        dfzeroflag = False
+        count = 1
+        while condition:
+            dfval=differentiator(function, xval)
+            if dfval==0:
+                dfzeroflag = True
+                break
+            xval = xval - (f(xval)/dfval)
+            count+=1
+            if count > n:
+                osciflag = True
+                break
+            condition = abs(f(xval))>=e and abs(dfval)>=0.001
+        if dfzeroflag:
+            outputText = Label(solvingNonLinearEqnWindow, text="First Derivative zero", font=('Arial', 15), justify=LEFT).place(x=430, y=450)
+        elif osciflag:
+            outputText = Label(solvingNonLinearEqnWindow, text="A case of oscillation", font=('Arial', 15), justify=LEFT).place(x=430, y=450)
+        else:
+            outputText = Label(solvingNonLinearEqnWindow, text="x = " + str(xval), font=('Arial', 15), justify=LEFT).place(x=430, y=450)
+        graphbtn = Button(solvingNonLinearEqnWindow, text="Show Graph", fg="black", command=showGraph).place(x=460, y=490)
+
+    def placeDataNR():
+        func2 = f2lbl.get()
+        x = xlbl.get()
+        e2 = e2lbl.get()
+        n = n2lbl.get()
+        NewtonRhapson(float(x), func2, float(e2), int(n))
+
+    #for Newton-Rhapson Method
+    f2text = Label(solvingNonLinearEqnWindow, text="f(x) =", font=('Arial', 10))
+    f2text.place(x=430, y=148)
+    f2lbl = Entry(solvingNonLinearEqnWindow, width=45) 
+    f2lbl.place(x=460, y=150)
+    xtext = Label(solvingNonLinearEqnWindow, text="x =", font=('Arial', 10))
+    xtext.place(x=430, y=248)
+    xlbl = Entry(solvingNonLinearEqnWindow, width=45) 
+    xlbl.place(x=460, y=250)
+    e2text = Label(solvingNonLinearEqnWindow, text="e =", font=('Arial', 10))
+    e2text.place(x=430, y=298)
+    e2lbl = Entry(solvingNonLinearEqnWindow, width=45) 
+    e2lbl.place(x=460, y=300)
+    n2text = Label(solvingNonLinearEqnWindow, text="n =", font=('Arial', 10))
+    n2text.place(x=430, y=348)
+    n2lbl = Entry(solvingNonLinearEqnWindow, width=45) 
+    n2lbl.place(x=460, y=350)  
+    btn = Button(solvingNonLinearEqnWindow, text="Submit for Newton Rhapson", fg="black", command = placeDataNR)
+    btn.place(x=460, y=400)
+
 window.title('Numerical Methods')
 maintitleframe = Frame(window)
 maintitleframe.pack(side=TOP, pady=50)
