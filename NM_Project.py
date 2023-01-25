@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tkinter import *
 from sympy import *
+import CurveFittingCode
+import time
 
 window = Tk()
 
@@ -243,6 +245,67 @@ def solvingNonLinearEqnMain():
     btn = Button(solvingNonLinearEqnWindow, text="Submit for Newton Rhapson", fg="black", command = placeDataNR)
     btn.place(x=460, y=400)
 
+def curveFittingmain():
+    def curveFitting():
+        print("Done!")
+
+    xdata = [] 
+    ydata = []
+    xpos = [] 
+    ypos = [] 
+
+    def getNval():
+        n = int(nlbl.get())
+        def getXYval():
+            global xposCF
+            global yposCF
+            xtemp = float(xlbl.get())
+            ytemp = float(ylbl.get())
+            xdata.append(xtemp)
+            ydata.append(ytemp)
+            print(xdata) 
+            print(ydata)
+            xpos.append(1)
+            ypos.append(1)
+            xposnum = len(xpos)
+            yposnum = len(ypos) #as normal logic cannot be used in python, list was used to count the number of times the function is called
+            xlbl.delete(0, END)
+            ylbl.delete(0, END)
+            xtext = Label(curveFittingwindow, text="x"+str(xposnum)+" =", font=('Arial', 10))
+            xtext.place(x=42, y=298)
+            ytext = Label(curveFittingwindow, text="y"+str(yposnum)+" =", font=('Arial', 10))
+            ytext.place(x=42, y=348)
+            if xposnum > n:
+                evalbtn = Button(curveFittingwindow, text="Evaluate", command=curveFitting)
+                evalbtn.place(x=45, y=450)
+        xtext = Label(curveFittingwindow, text="x0 =", font=('Arial', 10))
+        xtext.place(x=42, y=298)
+        xlbl = Entry(curveFittingwindow, width=45) 
+        xlbl.place(x=80, y=300)
+        ytext = Label(curveFittingwindow, text="y0 =", font=('Arial', 10))
+        ytext.place(x=42, y=348)
+        ylbl = Entry(curveFittingwindow, width=45) 
+        ylbl.place(x=80, y=350)
+        xySubmit = Button(curveFittingwindow, text="Submit", command=getXYval) 
+        xySubmit.place(x=45, y=400)
+
+    curveFittingwindow = Toplevel(window) 
+    curveFittingwindow.geometry("800x800+560+140")
+    curveFittingTitleFrame = Frame(curveFittingwindow)
+    curveFittingTitleFrame.pack(side = TOP, pady = 50)
+    title = Label(curveFittingTitleFrame, text="Curve Fitting", font = ('Arial', 25))
+    title.pack()
+    polyheadtext = Label(curveFittingwindow, text="Polynomial Curve Fitting", font=('Arial', 13))
+    polyheadtext.place(x=45, y=148)
+    ntext = Label(curveFittingwindow, text="Degree =", font=('Arial', 10))
+    ntext.place(x=17, y=198)
+    nlbl = Entry(curveFittingwindow, width=45) 
+    nlbl.place(x=80, y=200)
+    nSubmit = Button(curveFittingwindow, text="Submit", command=getNval)
+    nSubmit.place(x=45, y=250)
+    distext = Label(curveFittingwindow, text="Note: Number of data must be greater than degree and then evaluate button will appear.", fg="black")
+    distext.place(x=120, y=252)
+
 window.title('Numerical Methods')
 maintitleframe = Frame(window)
 maintitleframe.pack(side=TOP, pady=50)
@@ -253,5 +316,7 @@ btn1 = Button(window, text="Solving first order ODE", fg="black", command = solv
 btn1.pack()
 btn2 = Button(window, text="Solution of Non-Linear Equations", fg="black", command = solvingNonLinearEqnMain, font=('Arial',12), width=60)
 btn2.pack()
+btn3 = Button(window, text="Curve fitting", fg="black", command=curveFittingmain, font=('Arial', 12), width=60)
+btn3.pack()
 window.mainloop()
 
