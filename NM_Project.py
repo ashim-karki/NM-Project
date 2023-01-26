@@ -252,8 +252,29 @@ def curveFittingmain():
     ans = []
 
     def generateGraph():
-        print("Generating Graph")
-
+        power = len(ans) - 1
+        function = str(ans[0])+"*np.power(x,"+str(power)+")"
+        powerforloop = power
+        power -= 1
+        anspos = 1
+        for i in range(powerforloop):
+            if ans[anspos] >= 0:
+                function += "+"+str(ans[anspos])+"*np.power(x,"+str(power)+")"
+                power -= 1
+                anspos += 1
+            elif ans[anspos] < 0:
+                function += "-"+str(abs(ans[anspos]))+"*np.power(x,"+str(power)+")"
+                power -= 1
+                anspos += 1
+        x = np.linspace(-10, 10, 100)
+        plt.plot(x, eval(function), label="Graph of function")
+        plt.scatter(xdata, ydata, color="red")
+        plt.title("Polynomial Curve Fitting")
+        plt.grid()
+        plt.axhline(y=0, color="black")
+        plt.axvline(x=0, color="black")
+        plt.show()
+        
     def curveFitting(deg):
         nx = len(xdata)
         for i in range(deg+1):
