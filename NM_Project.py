@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tkinter import *
 from sympy import *
-import CurveFittingCode
-import time
 
 window = Tk()
 
@@ -246,25 +244,64 @@ def solvingNonLinearEqnMain():
     btn.place(x=460, y=400)
 
 def curveFittingmain():
-    def curveFitting():
-        print("Done!")
-
     xdata = [] 
     ydata = []
     xpos = [] 
     ypos = [] 
+    arr = []
+    ans = []
+
+    def generateGraph():
+        print("Generating Graph")
+
+    def curveFitting(deg):
+        nx = len(xdata)
+        for i in range(deg+1):
+            arrtemp = []
+            for j in range(deg+1):
+                xpowertemp = 0
+                ypowertemp = 0
+                for k in range(nx):
+                    xpowertemp += pow(xdata[k], i+j)
+                arrtemp.append(xpowertemp)
+            for k in range(nx):
+                ypowertemp += (pow(xdata[k], i)*ydata[k])
+            arrtemp.append(ypowertemp)
+            arr.insert(i, arrtemp)
+        #Gauss Jordan diagonalization
+        for j in range(deg+1):
+            if abs(arr[j][j])<=0.005:
+                print("Method cannot work")
+                exit()
+            for i in range(deg+1):
+                if i!=j:
+                    temp = arr[i][j]/arr[j][j]
+                    for k in range(deg+2):
+                        arr[i][k]=arr[i][k]-temp*arr[j][k]
+        for i in range(deg+1):
+            anstemp=0
+            anstemp = arr[i][deg+1]/arr[i][i]
+            ans.append(anstemp)
+        power = len(ans) - 1
+        ans.reverse()
+        outstring = "Required Eqn: "
+        for i in ans:
+            i = round(i ,2)
+            outstring += " + "+str(i)+"x^"+str(power)
+            power-=1
+        outstring += " = 0"
+        outputtext = Label(curveFittingwindow, text=outstring, font=('Arial', 13))
+        outputtext.place(x=45, y=500)
+        graphbtn = Button(curveFittingwindow, text="Generate Graph", command=generateGraph)
+        graphbtn.place(x=45, y=550)
 
     def getNval():
-        n = int(nlbl.get())
+        deg = int(deglbl.get())
         def getXYval():
-            global xposCF
-            global yposCF
             xtemp = float(xlbl.get())
             ytemp = float(ylbl.get())
             xdata.append(xtemp)
             ydata.append(ytemp)
-            print(xdata) 
-            print(ydata)
             xpos.append(1)
             ypos.append(1)
             xposnum = len(xpos)
@@ -275,8 +312,8 @@ def curveFittingmain():
             xtext.place(x=42, y=298)
             ytext = Label(curveFittingwindow, text="y"+str(yposnum)+" =", font=('Arial', 10))
             ytext.place(x=42, y=348)
-            if xposnum > n:
-                evalbtn = Button(curveFittingwindow, text="Evaluate", command=curveFitting)
+            if xposnum > deg:
+                evalbtn = Button(curveFittingwindow, text="Evaluate", command=lambda: curveFitting(deg))
                 evalbtn.place(x=45, y=450)
         xtext = Label(curveFittingwindow, text="x0 =", font=('Arial', 10))
         xtext.place(x=42, y=298)
@@ -297,10 +334,10 @@ def curveFittingmain():
     title.pack()
     polyheadtext = Label(curveFittingwindow, text="Polynomial Curve Fitting", font=('Arial', 13))
     polyheadtext.place(x=45, y=148)
-    ntext = Label(curveFittingwindow, text="Degree =", font=('Arial', 10))
-    ntext.place(x=17, y=198)
-    nlbl = Entry(curveFittingwindow, width=45) 
-    nlbl.place(x=80, y=200)
+    degtext = Label(curveFittingwindow, text="Degree =", font=('Arial', 10))
+    degtext.place(x=17, y=198)
+    deglbl = Entry(curveFittingwindow, width=45) 
+    deglbl.place(x=80, y=200)
     nSubmit = Button(curveFittingwindow, text="Submit", command=getNval)
     nSubmit.place(x=45, y=250)
     distext = Label(curveFittingwindow, text="Note: Number of data must be greater than degree and then evaluate button will appear.", fg="black")
